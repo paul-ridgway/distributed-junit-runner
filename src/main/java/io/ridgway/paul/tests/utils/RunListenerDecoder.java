@@ -1,6 +1,7 @@
 package io.ridgway.paul.tests.utils;
 
 import com.google.common.base.Throwables;
+import io.ridgway.paul.tests.api.Event;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;

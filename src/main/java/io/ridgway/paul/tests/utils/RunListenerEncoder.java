@@ -1,6 +1,7 @@
 package io.ridgway.paul.tests.utils;
 
 import com.google.common.base.Throwables;
+import io.ridgway.paul.tests.api.Event;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -21,33 +22,33 @@ public class RunListenerEncoder extends RunListener {
 
     @Override
     public void testRunStarted(final Description description) throws Exception {
-        runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_RUN_STARTED, encode(description));
+        runListenerTransport.sendEvent(Event.TEST_RUN_STARTED, encode(description));
     }
 
     @Override
     public void testRunFinished(final Result result) throws Exception {
-        runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_RUN_FINISHED, encode(result));
+        runListenerTransport.sendEvent(Event.TEST_RUN_FINISHED, encode(result));
     }
 
     @Override
     public void testStarted(final Description description) throws Exception {
-        runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_STARTED, encode(description));
+        runListenerTransport.sendEvent(Event.TEST_STARTED, encode(description));
     }
 
     @Override
     public void testFinished(final Description description) throws Exception {
-        runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_FINISHED, encode(description));
+        runListenerTransport.sendEvent(Event.TEST_FINISHED, encode(description));
     }
 
     @Override
     public void testFailure(final Failure failure) throws Exception {
-        runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_FAILURE, encode(failure));
+        runListenerTransport.sendEvent(Event.TEST_FAILURE, encode(failure));
     }
 
     @Override
     public void testAssumptionFailure(final Failure failure) {
         try {
-            runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_ASSUMPTION_FAILURE, encode(failure));
+            runListenerTransport.sendEvent(Event.TEST_ASSUMPTION_FAILURE, encode(failure));
         } catch (final Exception
                 e) {
             throw Throwables.propagate(e);
@@ -56,7 +57,7 @@ public class RunListenerEncoder extends RunListener {
 
     @Override
     public void testIgnored(final Description description) throws Exception {
-        runListenerTransport.sendEvent(RunListenerTransport.Event.TEST_IGNORED, encode(description));
+        runListenerTransport.sendEvent(Event.TEST_IGNORED, encode(description));
     }
 
     private byte[] encode(final Serializable object) {

@@ -1,6 +1,7 @@
 package io.ridgway.paul.tests.manager;
 
 import io.ridgway.paul.tests.executor.TestExecutor;
+import org.apache.thrift.transport.TTransportException;
 import org.junit.runner.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class TestRunner {
     private static final Pattern CLASS_PATTERN = Pattern.compile("\\.class$", Pattern.CASE_INSENSITIVE);
     private static final Pattern SLASH_PATTERN = Pattern.compile("/", Pattern.LITERAL);
 
-    public static void main(final String[] args) throws IOException, URISyntaxException, ClassNotFoundException {
+    public static void main(final String[] args) throws IOException, URISyntaxException, ClassNotFoundException, TTransportException {
 
         final String testJarPath = "/home/paul/Documents/Code/java-test-set/target/java-test-set-1.0-SNAPSHOT-tests.jar";
         final File testJar = new File(testJarPath);
@@ -47,10 +48,7 @@ public class TestRunner {
 
         final TestManager testManager = new TestManager();
         final List<TestExecutor> executors = new ArrayList<>();
-        executors.add(new TestExecutor(testManager));
-//        executors.add(new TestExecutor(testManager));
-//        executors.add(new TestExecutor(testManager));
-//        executors.add(new TestExecutor(testManager));
+        executors.add(new TestExecutor());
         executors.forEach(TestExecutor::start);
 
         testManager.addTests(classes);

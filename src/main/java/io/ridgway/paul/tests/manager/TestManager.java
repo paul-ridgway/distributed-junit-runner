@@ -4,6 +4,7 @@ import io.ridgway.paul.tests.utils.RelayListener;
 import io.ridgway.paul.tests.utils.RunListenerDecoder;
 import io.ridgway.paul.tests.utils.RunListenerTransport;
 import io.ridgway.paul.tests.utils.Sleep;
+import org.apache.thrift.transport.TTransportException;
 import org.junit.internal.TextListener;
 import org.junit.runner.Result;
 import org.slf4j.Logger;
@@ -19,28 +20,23 @@ public class TestManager {
     private final Result result = new Result();
     private final ConcurrentLinkedDeque<Class> testClasses = new ConcurrentLinkedDeque<>();
 
+    private final TestServer testServer;
     private final RelayListener relayListener;
     private final RunListenerTransport runListenerTransport;
 
     private volatile boolean running = false;
 
-    public TestManager() {
+    public TestManager() throws TTransportException {
         relayListener = new RelayListener();
         relayListener.addRunListener(result.createListener());
         relayListener.addRunListener(new TextListener(System.err));
         runListenerTransport = new RunListenerDecoder(relayListener);
+        testServer = new TestServer(10024, this);
+        testServer.start();
     }
 
     public void addTests(final Set<Class> classes) {
         testClasses.addAll(classes);
-    }
-
-    private void join(final Thread thread) {
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            L.info("Interrupted: {}", e.getMessage(), e);
-        }
     }
 
     public Result run() {
@@ -52,17 +48,16 @@ public class TestManager {
         return result;
     }
 
-    public Class getNext() {
+    public String getNext() {
         if (running) {
-            return testClasses.poll();
+            return testClasses.poll().getName();
         }
         return null;
     }
 
-    public RunListenerTransport getRunListener() {
+    public RunListenerTransport getRunListenerTransport() {
         return runListenerTransport;
     }
 
 }
-
 

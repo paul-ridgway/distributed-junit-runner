@@ -1,16 +1,8 @@
 package io.ridgway.paul.tests.utils;
 
-public interface RunListenerTransport {
+import io.ridgway.paul.tests.api.Event;
 
-    enum Event {
-        TEST_RUN_STARTED,
-        TEST_RUN_FINISHED,
-        TEST_STARTED,
-        TEST_FINISHED,
-        TEST_FAILURE,
-        TEST_ASSUMPTION_FAILURE,
-        TEST_IGNORED
-    }
+public interface RunListenerTransport {
 
     void sendEvent(Event event, byte[] data) throws Exception;
 
