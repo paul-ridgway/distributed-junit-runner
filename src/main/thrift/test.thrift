@@ -14,10 +14,16 @@ exception EventException {
     1: string message
 }
 
+exception NoJobsException {
+    1: string message
+}
+
 service TestService {
 
     string getNext(
         1: string workerId,
+    ) throws (
+        1: NoJobsException nje
     );
 
     void sendEvent(

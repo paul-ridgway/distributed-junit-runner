@@ -49,6 +49,9 @@ public class TestRunner {
         final TestManager testManager = new TestManager();
         final List<TestExecutor> executors = new ArrayList<>();
         executors.add(new TestExecutor());
+        executors.add(new TestExecutor());
+        executors.add(new TestExecutor());
+        executors.add(new TestExecutor());
         executors.forEach(TestExecutor::start);
 
         testManager.addTests(classes);

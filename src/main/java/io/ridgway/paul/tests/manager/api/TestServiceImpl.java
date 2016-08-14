@@ -2,10 +2,10 @@ package io.ridgway.paul.tests.manager.api;
 
 import io.ridgway.paul.tests.api.Event;
 import io.ridgway.paul.tests.api.EventException;
+import io.ridgway.paul.tests.api.NoJobsException;
 import io.ridgway.paul.tests.api.TestService;
 import io.ridgway.paul.tests.manager.TestManager;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,15 +19,15 @@ public class TestServiceImpl implements TestService.Iface {
     }
 
     @Override
-    public String getNext(final String workerId) throws TException {
-        L.info("getNext, workerId: {}", workerId);
-        return testManager.getNext();
+    public String getNext(final String workerId) throws NoJobsException {
+        L.debug("getNext, workerId: {}", workerId);
+        return testManager.getNext().orElseThrow(NoJobsException::new);
     }
 
     @Override
     public void sendEvent(final Event event, final String data) throws EventException {
         final byte[] bytes = Base64.decodeBase64(data);
-        L.info("sendEvent, event: {}, data: {} bytes", event, bytes.length);
+        L.debug("sendEvent, event: {}, data: {} bytes", event, bytes.length);
         try {
             testManager.getRunListenerTransport().sendEvent(event, bytes);
         } catch (final Exception e) {

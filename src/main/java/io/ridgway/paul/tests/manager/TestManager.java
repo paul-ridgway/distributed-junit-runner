@@ -10,6 +10,7 @@ import org.junit.runner.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -48,11 +49,11 @@ public class TestManager {
         return result;
     }
 
-    public String getNext() {
+    public Optional<String> getNext() {
         if (running) {
-            return testClasses.poll().getName();
+            return Optional.of(testClasses.poll().getName());
         }
-        return null;
+        return Optional.empty();
     }
 
     public RunListenerTransport getRunListenerTransport() {

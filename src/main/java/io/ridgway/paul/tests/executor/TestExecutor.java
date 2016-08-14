@@ -1,6 +1,7 @@
 package io.ridgway.paul.tests.executor;
 
 import com.google.common.base.Throwables;
+import io.ridgway.paul.tests.api.NoJobsException;
 import io.ridgway.paul.tests.api.TestService;
 import io.ridgway.paul.tests.utils.RunListenerEncoder;
 import io.ridgway.paul.tests.utils.Sleep;
@@ -82,20 +83,16 @@ public class TestExecutor {
         public void run() {
             while (running) {
                 L.info("Getting next...");
-                final String next;
                 try {
-                    next = client.getNext("test");
-                } catch (TException e) {
-                    //TODO: Move and handle better
-                    L.error("Error: {}", e.getMessage(), e);
-                    continue;
-                }
-                if (next == null) {
-                    L.info("Nothing to do...");
-                    Sleep.ms(1000);
-                } else {
+                    final String next = client.getNext("test");
                     L.info("Next: {}", next);
                     runTest(next);
+                } catch (final NoJobsException ignored) {
+                    L.info("Nothing to do...");
+                    Sleep.ms(1000);
+                } catch (final TException e) {
+                    L.error("Error: {}", e.getMessage(), e);
+                    Sleep.ms(1000);
                 }
             }
         }
