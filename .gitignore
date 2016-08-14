@@ -1,0 +1,16 @@
+src/main/resources/log4j.properties
+src/main/resources/default.properties
+out/
+.idea
+gen/
+*.iml
+.DS_Store
+*.class
+target/
+atlassian-ide-plugin.xml
+classes/
+release.properties
+dependency-reduced-pom.xml
+cache/
+velocity.log*
+src/main/resources/META-INF/version/
