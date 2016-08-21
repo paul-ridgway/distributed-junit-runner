@@ -61,6 +61,8 @@ public class TestRunner {
 
         L.info("Shutting down executors...");
         executors.forEach(TestExecutor::shutdown);
+        L.info("Shutting down manager...");
+        testManager.shutdown();
 
         System.out.println("--------------------------------------------------------");
         System.out.println("Results:");

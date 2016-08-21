@@ -51,7 +51,7 @@ public class TestManager {
 
     public Optional<String> getNext() {
         if (running) {
-            return Optional.of(testClasses.poll().getName());
+            return Optional.ofNullable(testClasses.poll()).map(Class::getName);
         }
         return Optional.empty();
     }
@@ -60,5 +60,9 @@ public class TestManager {
         return runListenerTransport;
     }
 
+    public void shutdown() {
+        L.info("shutdown");
+        testServer.shutdown();
+    }
 }
 
