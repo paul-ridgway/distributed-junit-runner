@@ -2,15 +2,10 @@ package io.ridgway.paul.tests.executor;
 
 import com.google.common.base.Throwables;
 import io.ridgway.paul.tests.api.NoJobsException;
-import io.ridgway.paul.tests.api.TestService;
 import io.ridgway.paul.tests.utils.RunListenerEncoder;
 import io.ridgway.paul.tests.utils.Sleep;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.thrift.TException;
-import org.apache.thrift.protocol.TBinaryProtocol;
-import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TFramedTransport;
-import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.runner.JUnitCore;
 import org.slf4j.Logger;
@@ -24,24 +19,14 @@ public class TestExecutor {
 
     private final JUnitCore jUnitCore = new JUnitCore();
     private final RunListenerEncoder runListenerEncoder;
-    private final TestService.Client client;
+    private final Client client;
     private volatile boolean running = false;
 
-    public TestExecutor() throws TTransportException {
-        final TSocket socket = new TSocket("localhost", 10024);
-        final TFramedTransport transport = new TFramedTransport(socket);
+    public TestExecutor(final String host, final int port) throws TTransportException {
+        client = new Client(host, port);
+        client.connect();
 
-        //TODO: Move connection handling outside
-        L.info("Connecting...");
-        socket.open();
-
-        L.info("Connected");
-
-        final TProtocol protocol = new TBinaryProtocol(transport);
-
-        client = new TestService.Client(protocol);
-
-        this.runListenerEncoder = new RunListenerEncoder((event, data) -> client.sendEvent(event, new String(Base64.encodeBase64(data))));
+        this.runListenerEncoder = new RunListenerEncoder((event, data) -> client.executeVoid(c -> c.sendEvent(event, new String(Base64.encodeBase64(data)))));
         jUnitCore.addListener(runListenerEncoder);
     }
 
@@ -50,6 +35,8 @@ public class TestExecutor {
         running = true;
         executorThread.start();
     }
+
+    //TODO: Add shutdown listener
     public void shutdown() {
         L.info("shutdown");
         running = false;
@@ -84,7 +71,7 @@ public class TestExecutor {
             while (running) {
                 L.info("Getting next...");
                 try {
-                    final String next = client.getNext("test");
+                    final String next = client.execute(c -> c.getNext("test"));
                     L.info("Next: {}", next);
                     runTest(next);
                 } catch (final NoJobsException ignored) {

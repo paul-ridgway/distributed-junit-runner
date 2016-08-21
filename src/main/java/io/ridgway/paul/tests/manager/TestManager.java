@@ -27,12 +27,12 @@ public class TestManager {
 
     private volatile boolean running = false;
 
-    public TestManager() throws TTransportException {
+    public TestManager(final int port) throws TTransportException {
         relayListener = new RelayListener();
         relayListener.addRunListener(result.createListener());
         relayListener.addRunListener(new TextListener(System.err));
         runListenerTransport = new RunListenerDecoder(relayListener);
-        testServer = new TestServer(10024, this);
+        testServer = new TestServer(port, this);
         testServer.start();
     }
 

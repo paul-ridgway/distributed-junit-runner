@@ -1,6 +1,5 @@
 package io.ridgway.paul.tests.manager;
 
-import io.ridgway.paul.tests.executor.TestExecutor;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.runner.Result;
 import org.slf4j.Logger;
@@ -10,10 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -27,12 +24,12 @@ public class TestRunner {
     private static final Pattern CLASS_PATTERN = Pattern.compile("\\.class$", Pattern.CASE_INSENSITIVE);
     private static final Pattern SLASH_PATTERN = Pattern.compile("/", Pattern.LITERAL);
 
-    public static void main(final String[] args) throws IOException, URISyntaxException, ClassNotFoundException, TTransportException {
-
-        final String testJarPath = "/home/paul/Documents/Code/java-test-set/target/java-test-set-1.0-SNAPSHOT-tests.jar";
-        final File testJar = new File(testJarPath);
+    public void run(final File testJar, final int port)
+            throws IOException, URISyntaxException, TTransportException, ClassNotFoundException {
+        L.info("Runner, jar: {}, port: {}", testJar.getPath(), port);
 
         //TODO: Move to method, better condition handling
+        //TODO: Use in runner too?
         final Set<URI> classPaths = ClasspathHelper.enumerateClasspath();
         classPaths.forEach(uri -> L.info("Classpath contains: {}", uri));
         classPaths.stream()
@@ -46,21 +43,12 @@ public class TestRunner {
         L.info("Running tests...");
         final long startedAt = System.currentTimeMillis();
 
-        final TestManager testManager = new TestManager();
-        final List<TestExecutor> executors = new ArrayList<>();
-        executors.add(new TestExecutor());
-        executors.add(new TestExecutor());
-        executors.add(new TestExecutor());
-        executors.add(new TestExecutor());
-        executors.forEach(TestExecutor::start);
-
+        final TestManager testManager = new TestManager(port);
         testManager.addTests(classes);
 
         final Result result = testManager.run();
         final long finishedAt = System.currentTimeMillis();
 
-        L.info("Shutting down executors...");
-        executors.forEach(TestExecutor::shutdown);
         L.info("Shutting down manager...");
         testManager.shutdown();
 
@@ -93,16 +81,6 @@ public class TestRunner {
         }
         return classes;
     }
-
-    //        core.addListener(new JUnitResultFormatterAsRunListener(new XMLJUnitResultFormatter()) {
-//            @Override
-//            public void testStarted(final Description description) throws Exception {
-//                System.err.println( description.getDisplayName());
-////                formatter.setOutput(System.out);
-////                formatter.setOutput(new FileOutputStream(new File(reportDir, "TEST-" + description.getDisplayName() + ".xml")));
-//                super.testStarted(description);
-//            }
-//        });
 
 }
 

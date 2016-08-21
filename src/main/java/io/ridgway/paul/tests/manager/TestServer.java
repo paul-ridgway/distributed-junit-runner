@@ -20,20 +20,20 @@ public class TestServer {
     private static final int CLIENT_TIMEOUT_MILLIS = 60000;
     private static final int MAX_FRAME_SIZE = 1024 * 1024;
     private final TNonblockingServer server;
-    private final TestServiceImpl service;
     private final Thread serverThread;
 
     //TODO: Re-throw exception
     public TestServer(final int port, final TestManager testManager) throws TTransportException {
         L.info("init, port: {}", port);
-        service = new TestServiceImpl(testManager);
+        final TestServiceImpl service = new TestServiceImpl(testManager);
         final TestService.Processor<TestServiceImpl> processor = new TestService.Processor<>(service);
         final TProcessorFactory processorFactory = new TProcessorFactory(processor);
         final TNonblockingServerSocket transport = new TNonblockingServerSocket(port, CLIENT_TIMEOUT_MILLIS);
         final TProtocolFactory protocolFactory = new TBinaryProtocol.Factory();
         final TTransportFactory transportFactory = new TFramedTransport.Factory(MAX_FRAME_SIZE);
         final TNonblockingServer.Args args = new TNonblockingServer.Args(transport)
-                .processorFactory(processorFactory).protocolFactory(protocolFactory)
+                .processorFactory(processorFactory)
+                .protocolFactory(protocolFactory)
                 .transportFactory(transportFactory);
         server = new TNonblockingServer(args);
         serverThread = new Thread(server::serve);
