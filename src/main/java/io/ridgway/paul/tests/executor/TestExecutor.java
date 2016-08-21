@@ -24,7 +24,6 @@ public class TestExecutor {
 
     public TestExecutor(final String host, final int port) throws TTransportException {
         client = new Client(host, port);
-        client.connect();
 
         this.runListenerEncoder = new RunListenerEncoder((event, data) -> client.executeVoid(c -> c.sendEvent(event, new String(Base64.encodeBase64(data)))));
         jUnitCore.addListener(runListenerEncoder);
@@ -80,6 +79,9 @@ public class TestExecutor {
                 } catch (final TException e) {
                     L.error("Error: {}", e.getMessage(), e);
                     Sleep.ms(1000);
+                } catch (final ConnectionException e) {
+                    L.error("Connection error: {}", e.getMessage());
+                    Sleep.ms(5000);
                 }
             }
         }
